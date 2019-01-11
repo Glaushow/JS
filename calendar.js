@@ -1,10 +1,12 @@
 /**
  * Auth Laushow
  * Time 20190111 16:20
+ * size default,middle
  * aget $('.calendar').calendar();
  */
 $.fn.extend({
     option: {
+        size: 'default',
         weeks: ['一', '二', '三', '四', '五', '六', '日']
     },
     calendar: function (options) {
@@ -19,8 +21,8 @@ $.fn.extend({
             isMonth = true;
         }
         _thisOption.dayHtml = '<div class="_calendar-header">';
-        _thisOption.dayHtml += '<span class="solar-calendar">'+now.getFullYear()+'-'+now.getMonth()+1+'-'+today+'(星期'+_thisOption.weeks[(now.getDay()-1)]+')</span>';
-        _thisOption.dayHtml += '<span class="lunar-calendar">'+this.lunarDay(now.getFullYear(), now.getMonth(), today,'GetcDateString')+'</span>';
+        _thisOption.dayHtml += '<span class="solar-calendar">' + now.getFullYear() + '-' + now.getMonth() + 1 + '-' + today + '(星期' + _thisOption.weeks[(now.getDay() - 1)] + ')</span>';
+        _thisOption.dayHtml += '<span class="lunar-calendar">' + this.lunarDay(now.getFullYear(), now.getMonth(), today, 'GetcDateString') + '</span>';
         _thisOption.dayHtml += '</div>';
         _thisOption.dayHtml += '<div class="week-box">';
 
@@ -58,6 +60,7 @@ $.fn.extend({
                 _thisOption.document.find('._calendar-box').html(_thisOption.dayHtml);
             }
         }
+        console.log(_thisOption.document.find('._calendar-box').width());
         _thisOption.document.css({
             'width': _thisOption.document.find('._calendar-box').width(),
             'height': _thisOption.document.find('._calendar-box').height(),
@@ -67,11 +70,17 @@ $.fn.extend({
         });
     },
     setCss: function () {
-        var css = '<style type="text/css" >' +
-            '.mouse-light {moz-user-select: -moz-none;-moz-user-select: none;-o-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-index: 5;position: absolute;display: block;width: 180px;height: 180px;border-radius: 50%;-moz-border-radius: 50%;-webkit-border-radius: 50%;background-image: radial-gradient(rgba(200, 200, 200, 1) 1%, rgba(150, 150, 150, 1) 25%, rgba(51, 51, 51, 1) 60%);}\n' +
+        var css = '<style type="text/css" >';
+        if (this.option.size == 'middle') {
+            css += '._calendar-box p span span, ._calendar-box .week-box span span {width: 40px;height: 40px;line-height: 40px;color: #ccc;text-align: center;background: rgba(51, 51, 51, 1);margin: 1px;display: block;}';
+            css += '._calendar-box p span span b, ._calendar-box p span span label {width: 100%;height: 50%;line-height: 32px;display: block;}';
+        } else {
+            css += '._calendar-box p span span, ._calendar-box .week-box span span {width: 50px;height: 50px;line-height: 50px;color: #ccc;text-align: center;background: rgba(51, 51, 51, 1);margin: 1px;display: block;}';
+            css += '._calendar-box p span span b, ._calendar-box p span span label {width: 100%;height: 50%;line-height: 32px;display: block;}';
+        }
+        css += '.mouse-light {moz-user-select: -moz-none;-moz-user-select: none;-o-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-index: 5;position: absolute;display: block;width: 180px;height: 180px;border-radius: 50%;-moz-border-radius: 50%;-webkit-border-radius: 50%;background-image: radial-gradient(rgba(200, 200, 200, 1) 1%, rgba(150, 150, 150, 1) 25%, rgba(51, 51, 51, 1) 60%);}\n' +
+            '._calendar-box{display:inline-block;}' +
             '._calendar-box p span {position: relative;cursor: default;z-index: 10;display: inline-block;border: 1px solid rgba(51, 51, 51, 1);}\n' +
-            '._calendar-box p span span, ._calendar-box .week-box span span {width: 50px;height: 50px;line-height: 50px;color: #ccc;text-align: center;background: rgba(51, 51, 51, 1);margin: 1px;display: block;}\n' +
-            '._calendar-box p span span b, ._calendar-box p span span label {width: 100%;height: 50%;line-height: 32px;display: block;}\n' +
             '._calendar-box p span span label {width: 100%;height: 50%;font-size: 12px;line-height: 18px;}\n' +
             '._calendar-box p span .festival {color: rgb(83, 140, 181);}\n' +
             '._calendar-box .week-box span {position: relative;cursor: default;z-index: 10;display: inline-block;border: 1px solid rgba(51, 51, 51, 1);background: rgba(51, 51, 51, 1);}\n' +
@@ -86,13 +95,6 @@ $.fn.extend({
             '</style>';
         if (this.option.document.find('.mouse-light').length <= 0) {
             this.option.document.append(css);
-            this.option.document.css({
-                'width': '392px',
-                'height': '336px',
-                'position': 'relative',
-                'overflow': 'hidden',
-                'background': "rgba(51,51,51,1)"
-            });
             this.option.document.append('<span class="mouse-light"></span><div class="_calendar-box"></div>');
         }
     },
@@ -137,7 +139,7 @@ $.fn.extend({
             }
         })
     },
-    lunarDay: function (year, month, day,fun) {
+    lunarDay: function (year, month, day, fun) {
         var CalendarData = new Array(100);
         var madd = new Array(12);
         var tgString = "甲乙丙丁戊己庚辛壬癸";
@@ -296,11 +298,12 @@ $.fn.extend({
                 return tmp;
             }
         }
-        if(fun){
-            return eval(fun+'('+year+','+month+1+','+day+')');
+
+        if (fun) {
+            return eval(fun + '(' + year + ',' + month + 1 + ',' + day + ')');
         } else {
             return GetLunarDay(year, month, day)
         }
-        
+
     }
 })

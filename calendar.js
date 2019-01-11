@@ -10,14 +10,20 @@ $.fn.extend({
     calendar: function (options) {
         var _thisOption = this.option;
         var isMonth = false
-            , today = new Date().getDate()
+            , now = new Date()
+            , today = now.getDate()
             , _lunar = ''
             , _lastDay = 0;
         this.setOption(options);
-        if (new Date().getFullYear() == _thisOption.year && new Date().getMonth() + 1 == _thisOption.month) {
+        if (new Date().getFullYear() == _thisOption.year && now.getMonth() + 1 == _thisOption.month) {
             isMonth = true;
         }
-        _thisOption.dayHtml = '<div class="week-box">';
+        _thisOption.dayHtml = '<div class="_calendar-header">';
+        _thisOption.dayHtml += '<span class="solar-calendar">'+now.getFullYear()+'-'+now.getMonth()+1+'-'+today+'(星期'+_thisOption.weeks[(now.getDay()-1)]+')</span>';
+        _thisOption.dayHtml += '<span class="lunar-calendar">'+this.lunarDay(now.getFullYear(), now.getMonth(), today,'GetcDateString')+'</span>';
+        _thisOption.dayHtml += '</div>';
+        _thisOption.dayHtml += '<div class="week-box">';
+
         for (var week = 0; week <= 6; week++) {
             _thisOption.dayHtml += '<span><span class="week-header">' + _thisOption.weeks[week] + '</span></span>';
         }
@@ -49,9 +55,16 @@ $.fn.extend({
                     }
                 }
                 _thisOption.dayHtml += '</p>';
-                this.option.document.find('._calendar-box').html(_thisOption.dayHtml);
+                _thisOption.document.find('._calendar-box').html(_thisOption.dayHtml);
             }
         }
+        _thisOption.document.css({
+            'width': _thisOption.document.find('._calendar-box').width(),
+            'height': _thisOption.document.find('._calendar-box').height(),
+            'position': 'relative',
+            'overflow': 'hidden',
+            'background': "rgba(51,51,51,1)"
+        });
     },
     setCss: function () {
         var css = '<style type="text/css" >' +
@@ -62,11 +75,14 @@ $.fn.extend({
             '._calendar-box p span span label {width: 100%;height: 50%;font-size: 12px;line-height: 18px;}\n' +
             '._calendar-box p span .festival {color: rgb(83, 140, 181);}\n' +
             '._calendar-box .week-box span {position: relative;cursor: default;z-index: 10;display: inline-block;border: 1px solid rgba(51, 51, 51, 1);background: rgba(51, 51, 51, 1);}\n' +
-            '._calendar-box p span .today-active {background: rgba(0, 105, 189, 1);}\n' +
+            '._calendar-box p span .today-active {background: rgb(0, 105, 189);}\n' +
             '._calendar-box p span .outer-day {color: #666;}\n' +
-            '._calendar-box p .active {border: 1px solid rgba(0, 105, 189, 1);}\n' +
+            '._calendar-box p .active {border: 1px solid rgb(0, 105, 189);}\n' +
             '._calendar-box p span span:not(.today-active):not(.week-header):hover {border: 1px solid rgb(180, 180, 180);background-color: rgba(50, 50, 50, 0.8);}\n' +
             '._calendar-box p span .today-active:hover {border: 1px solid rgb(180, 180, 180);}\n' +
+            '._calendar-header{background: rgb(51,51,51);display: block;text-align: center;z-index: 10;position: relative;color: #ccc;font-size: 14px;}' +
+            '._calendar-header .solar-calendar{width:100%;height:25px;line-height:32px;display:block;font-size:14px;}' +
+            '._calendar-header .lunar-calendar{font-size:12px;width:100%;height:16px;line-height:16px;display:block;color: rgb(83, 140, 181);}' +
             '</style>';
         if (this.option.document.find('.mouse-light').length <= 0) {
             this.option.document.append(css);
@@ -110,9 +126,9 @@ $.fn.extend({
         this.option.lastMonthDay = new Date(this.option.year, this.option.month - 1, 0).getDate();
         this.option.nextMonthDay = new Date(this.option.year, this.option.month = 1, 0).getDate();
         this.option.document.bind('mousemove', function (ev) {
-            var lastx = ev.pageX - $('.mouse-light').width() / 2;
-            var lasty = ev.pageY - $('.mouse-light').width() / 2;
-            $(".mouse-light").animate({left: lastx + 'px', top: lasty + 'px'}, 10);
+            var lastx = ev.pageX - _that.option.document.find('.mouse-light').width() / 2;
+            var lasty = ev.pageY - _that.option.document.find('.mouse-light').width() / 2;
+            _that.option.document.find(".mouse-light").animate({left: lastx + 'px', top: lasty + 'px'}, 10);
         })
         this.option.document.on('click', 'p > span', function () {
             if ($(this).hasClass('week-header') == false) {
@@ -121,7 +137,7 @@ $.fn.extend({
             }
         })
     },
-    lunarDay: function (year, month, day) {
+    lunarDay: function (year, month, day,fun) {
         var CalendarData = new Array(100);
         var madd = new Array(12);
         var tgString = "甲乙丙丁戊己庚辛壬癸";
@@ -218,8 +234,10 @@ $.fn.extend({
             }
         }
 
-        function GetcDateString() {
+        function GetcDateString(solarYear, solarMonth, solarDay) {
             var tmp = "";
+            solarMonth = (parseInt(solarMonth) > 0) ? (solarMonth - 1) : 11;
+            e2c(solarYear, solarMonth, solarDay);
             tmp += tgString.charAt((cYear - 4) % 10);
             tmp += dzString.charAt((cYear - 4) % 12);
             tmp += "(";
@@ -278,7 +296,11 @@ $.fn.extend({
                 return tmp;
             }
         }
-
-        return GetLunarDay(year, month, day)
+        if(fun){
+            return eval(fun+'('+year+','+month+1+','+day+')');
+        } else {
+            return GetLunarDay(year, month, day)
+        }
+        
     }
 })

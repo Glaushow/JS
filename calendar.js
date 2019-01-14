@@ -233,6 +233,14 @@ $.fn.extend({
                     cMonth--;
                 }
             }
+            if ((cMonth + 1) < 10) {
+                cMonth = '0' + cMonth;
+            } else {
+                cMonth = cMonth;
+            }
+            if (cDay < 10) {
+                cDay = '0' + cDay;
+            }
         }
 
         function GetcDateString(solarYear, solarMonth, solarDay) {

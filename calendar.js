@@ -60,7 +60,6 @@ $.fn.extend({
                 _thisOption.document.find('._calendar-box').html(_thisOption.dayHtml);
             }
         }
-        console.log(_thisOption.document.find('._calendar-box').width());
         _thisOption.document.css({
             'width': _thisOption.document.find('._calendar-box').width(),
             'height': _thisOption.document.find('._calendar-box').height(),
@@ -283,9 +282,9 @@ $.fn.extend({
                 if (solarDay < 10) {
                     solarDay = '0' + solarDay;
                 }
-                var tmp = '', ftvKey = solarMonth + '' + solarDay;
-                if (sFtv[ftvKey] != undefined) {
-                    tmp = '<label class="festival">' + sFtv[ftvKey] + '</label>';
+                var tmp = '', ftvKey = cMonth + '' + cDay,sftKey = solarMonth + '' + solarDay;
+                if (sFtv[sftKey] != undefined) {
+                    tmp = '<label class="festival">' + sFtv[sftKey] + '</label>';
                 } else if (lFtv[ftvKey] != undefined) {
                     tmp = '<label class="festival">' + lFtv[ftvKey] + '</label>';
                 } else {
